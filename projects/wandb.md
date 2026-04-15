@@ -38,3 +38,7 @@ The GitHub for ML experiments. Track every experiment, compare runs, share resul
 - Artifact versioning with lineage
 - LLM evaluation/tracing patterns (Weave)
 - Sweep/hyperparameter optimization strategies
+
+## 天子点评
+
+ML实验的GitHub，概念极强但Python-only+商业产品为主。天子当前阶段不需要，进入模型微调阶段后再用。Weave(LLM评估)值得关注。
