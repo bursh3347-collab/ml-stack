@@ -1,93 +1,94 @@
-# RAG (Retrieval-Augmented Generation) Patterns
+# Best Practices: RAG Patterns
 
-> Best practices extracted from LlamaIndex (49k⭐) and the broader RAG ecosystem.
+> Extracted from LlamaIndex, HuggingFace Transformers, and production RAG deployments
 
-*Sources: run-llama/llama_index (49k⭐), multiple RAG research papers*
+## Overview
 
-## 1. Basic RAG Pipeline
+Retrieval-Augmented Generation (RAG) is the #1 pattern for making LLMs work with private data. This document captures production-proven patterns from the top RAG frameworks.
+
+## Pattern 1: Basic RAG Pipeline (from LlamaIndex)
+
+**Source**: LlamaIndex (48k⭐, MIT)
 
 ```
-[Documents] → [Chunking] → [Embedding] → [Vector Store]
-                                              |
-[User Query] → [Embedding] → [Retrieval] → [Context + Query] → [LLM] → [Response]
+Documents → Chunking → Embedding → Vector Store → Query → Retrieval → LLM → Response
 ```
 
-**Key Decisions**:
-- **Chunk size**: 512-1024 tokens (balance between context and precision)
-- **Chunk overlap**: 20-50 tokens (preserve context at boundaries)
-- **Embedding model**: OpenAI text-embedding-3-small (cost) or large (quality)
-- **Top-K**: Retrieve 3-5 chunks (more = more noise)
-
-## 2. Advanced RAG Patterns
-
-### Hybrid Search (Vector + Keyword)
-- Combine semantic search (embeddings) with keyword search (BM25)
-- Re-rank with cross-encoder for best results
-- LlamaIndex supports this natively via `QueryFusionRetriever`
-
-### Hierarchical Indexing
-- Create summary index for documents, detail index for chunks
-- Query summary first, then drill into relevant chunks
-- Reduces latency and improves relevance for large corpora
-
-### Sentence Window Retrieval
-- Embed individual sentences for precision
-- Retrieve surrounding window (±2-3 sentences) for context
-- Best for Q&A use cases
-
-### Parent-Child Retrieval
-- Embed small chunks (child) for matching precision
-- Return parent chunk for richer context
-- Balances precision and context
-
-## 3. Evaluation Framework
-
-| Metric | What It Measures | Tool |
-|--------|-----------------|------|
-| **Faithfulness** | Response grounded in retrieved context | RAGAS |
-| **Relevancy** | Retrieved chunks relevant to query | RAGAS |
-| **Context Recall** | Are all relevant docs retrieved? | RAGAS |
-| **Answer Correctness** | Does answer match ground truth? | Custom |
-
-## 4. Production RAG Checklist
-
-- [ ] Chunking strategy tested (size, overlap, method)
-- [ ] Embedding model selected and benchmarked
-- [ ] Hybrid search (vector + keyword) implemented
-- [ ] Re-ranking enabled for top results
-- [ ] Metadata filtering available
-- [ ] Evaluation pipeline set up (RAGAS or custom)
-- [ ] Caching layer for repeated queries
-- [ ] Source attribution in responses
-- [ ] Error handling for empty retrievals
-- [ ] Monitoring: latency, retrieval quality, user satisfaction
-
-## 5. Common Anti-Patterns
-
-| Anti-Pattern | Problem | Solution |
-|-------------|---------|----------|
-| Too large chunks | Noisy context dilutes answer | Use 512-1024 tokens |
-| No overlap | Context lost at boundaries | Add 20-50 token overlap |
-| Too many results | LLM confused by irrelevant context | Limit to top 3-5 + re-rank |
-| No evaluation | Can't measure improvement | Set up RAGAS pipeline |
-| Ignoring metadata | Miss filtering opportunities | Add date, source, category |
-| No caching | Repeated queries hit vector DB | Cache embeddings + results |
-
-## LlamaIndex TypeScript Quick Start
-
+**TypeScript Implementation** (LlamaIndex.TS + Supabase):
 ```typescript
 import { VectorStoreIndex, SimpleDirectoryReader } from 'llamaindex';
+import { SupabaseVectorStore } from '@llamaindex/community';
 
-// 1. Load documents
-const documents = await new SimpleDirectoryReader().loadData('./data');
+// 1. Ingest
+const documents = await new SimpleDirectoryReader().loadData('./docs');
 
-// 2. Create index
-const index = await VectorStoreIndex.fromDocuments(documents);
+// 2. Index (with Supabase pgvector)
+const vectorStore = new SupabaseVectorStore({ /* config */ });
+const index = await VectorStoreIndex.fromDocuments(documents, { vectorStore });
 
 // 3. Query
 const queryEngine = index.asQueryEngine();
-const response = await queryEngine.query('What is the main topic?');
-console.log(response.toString());
+const response = await queryEngine.query('What is the return policy?');
+console.log(response.toString()); // Answer with citations
 ```
 
-**天子 Note**: LlamaIndex.TS is the most viable RAG framework for the TypeScript stack.
+## Pattern 2: Hybrid Search (Vector + Keyword)
+
+**Source**: LlamaIndex + production deployments
+
+**Why**: Pure vector search misses exact matches; pure keyword search misses semantic similarity.
+
+```
+Query → [Vector Search] + [BM25/FTS] → Reciprocal Rank Fusion → Top-K → LLM
+```
+
+**Implementation with Supabase**:
+- pgvector for semantic search
+- PostgreSQL full-text search for keyword matching
+- RRF (Reciprocal Rank Fusion) to merge results
+
+## Pattern 3: Chunking Strategies
+
+| Strategy | Best For | Chunk Size |
+|----------|---------|------------|
+| **Fixed size** | Simple documents | 512-1024 tokens |
+| **Sentence-based** | Articles, blogs | 3-5 sentences |
+| **Semantic** | Technical docs | Variable (by topic) |
+| **Recursive** | Structured docs | Hierarchical |
+| **Document-level** | Short docs (<1 page) | Whole document |
+
+**Golden Rule**: Chunk size should match your query granularity. If users ask specific questions, use smaller chunks (256-512). If users ask broad questions, use larger chunks (1024-2048).
+
+## Pattern 4: Citation & Source Tracking
+
+**Source**: LlamaIndex
+
+**Best Practice**: Every RAG response should cite its sources.
+
+```typescript
+const response = await queryEngine.query(question);
+
+// Access source nodes
+for (const node of response.sourceNodes) {
+  console.log(`Source: ${node.metadata.filename}`);
+  console.log(`Score: ${node.score}`);
+  console.log(`Text: ${node.text.substring(0, 100)}...`);
+}
+```
+
+## Pattern 5: Evaluation (from RAGAS)
+
+| Metric | What It Measures | Target |
+|--------|-----------------|--------|
+| **Faithfulness** | Is the answer supported by context? | >0.85 |
+| **Relevancy** | Is the retrieved context relevant? | >0.80 |
+| **Context Precision** | Are relevant docs ranked higher? | >0.75 |
+| **Answer Correctness** | Is the answer factually correct? | >0.80 |
+
+## Anti-Patterns
+
+1. **No evaluation**: Always measure RAG quality before deploying
+2. **Single embedding model**: Test multiple embedding models (OpenAI, Cohere, local)
+3. **Fixed chunk size**: Different document types need different chunking strategies
+4. **No reranking**: Add a reranker (Cohere, cross-encoder) after initial retrieval
+5. **Ignoring metadata**: Use metadata filters (date, source, category) to improve precision

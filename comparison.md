@@ -1,66 +1,65 @@
-# ML/DL Stack — Project Comparison
+# ML/DL Framework Comparison — 2026-04-15
 
-> Horizontal comparison of 7 high-star ML/DL projects analyzed in this repository.
+> Comprehensive comparison of 7 top machine learning and deep learning projects
 
-*Last updated: 2026-04-15*
+## Overview Matrix
 
-## Overview Table
+| Project | Stars | License | Language | TEMC | Category | Status |
+|---------|-------|---------|----------|------|----------|--------|
+| **HuggingFace Transformers** | 159k | Apache-2.0 | Python | **89** | Model Hub / LLM Framework | 🔴 Essential |
+| **Ollama** | 169k | MIT | Go | **89** | Local LLM Runtime | 🔴 Essential |
+| **LlamaIndex** | 48k | MIT | Python/TS | **86** | RAG Framework | 🔴 Essential |
+| **vLLM** | 76k | Apache-2.0 | Python/CUDA | **86** | LLM Serving Engine | 🟡 Important |
+| **PyTorch** | 99k | BSD-3 | Python/C++ | **79** | DL Framework | 🟡 Foundation |
+| **Scikit-learn** | 65k | BSD-3 | Python | **73** | Classical ML | 🟢 Reference |
+| **TensorFlow** | 194k | Apache-2.0 | C++/Python | **71** | DL Framework | 🟢 Legacy |
 
-| Project | Stars | License | Language | Latest | T | E | M | C | **TEMC** |
-|---------|-------|---------|----------|--------|---|---|---|---|----------|
-| **HF Transformers** | 159k | Apache-2.0 | Python | v5.5.4 (Apr 13) | 90 | 95 | 85 | 82 | **88** |
-| **Ollama** | 169k | MIT | Go | — | 85 | 92 | 90 | 85 | **88** |
-| **vLLM** | 77k | Apache-2.0 | Python/C++ | v0.19.0 (Apr 3) | 90 | 88 | 92 | 78 | **87** |
-| **LlamaIndex** | 49k | MIT | Python/TS | — | 82 | 80 | 88 | 85 | **84** |
-| **PyTorch** | 99k | BSD-3 | Python/C++ | v2.11.0 (Mar 23) | 92 | 95 | 75 | 70 | **82** |
-| **TensorFlow** | 195k | Apache-2.0 | C++/Python | — | 88 | 90 | 65 | 60 | **75** |
-| **Scikit-learn** | 66k | BSD-3 | Python | — | 88 | 85 | 60 | 65 | **73** |
+## Technology Stack Compatibility (with 天子基准栈)
 
-## Category Breakdown
+| Project | TypeScript | Next.js | Supabase | OpenAI | Vercel | Score |
+|---------|-----------|---------|----------|--------|--------|-------|
+| LlamaIndex | ✅ LlamaIndex.TS | ✅ | ✅ pgvector | ✅ | ✅ | ⭐⭐⭐⭐⭐ |
+| Ollama | ✅ REST API | ✅ | ✅ | ✅ compatible | ❌ local | ⭐⭐⭐⭐ |
+| HF Transformers | ❌ Python | ❌ API only | ✅ | ✅ | ❌ | ⭐⭐⭐ |
+| vLLM | ❌ Python | ❌ API only | ❌ | ✅ compatible | ❌ | ⭐⭐ |
+| PyTorch | ❌ Python | ❌ | ❌ | N/A | ❌ | ⭐ |
+| Scikit-learn | ❌ Python | ❌ | ❌ | N/A | ❌ | ⭐ |
+| TensorFlow | ✅ TF.js | ✅ | ❌ | N/A | ✅ | ⭐⭐ |
 
-### 🏗️ Frameworks (Foundation Layer)
-| | PyTorch | TensorFlow |
-|---|---------|------------|
-| **Position** | #1 in research + gaining production | #1 in legacy production |
-| **Growth** | Accelerating | Decelerating |
-| **TypeScript** | ❌ | TF.js (limited) |
-| **Best For** | Training, research, new projects | Enterprise legacy, TPU, mobile (TFLite) |
-| **Recommendation** | ✅ Learn this | 🟡 Know architecture, don't invest deeply |
+## Activity & Health (2026-04-15)
 
-### 🧠 Model Hub & Inference
-| | HF Transformers | Ollama | vLLM |
-|---|-----------------|--------|------|
-| **Position** | Universal model hub | Local LLM runner | Production serving |
-| **Use Case** | Model access & fine-tuning | Development & privacy | High-throughput serving |
-| **API** | Python library | OpenAI-compatible REST | OpenAI-compatible REST |
-| **TypeScript** | transformers.js | API (language-agnostic) | API (language-agnostic) |
-| **Best For** | Any LLM application | Local dev, privacy-first apps | Production deployment |
-| **Recommendation** | ✅ Essential | ✅ Essential for local dev | ✅ Essential for deployment |
+| Project | Last Commit | Commits/Day | Open Issues | Issue Ratio | Release Freq |
+|---------|------------|-------------|-------------|-------------|-------------|
+| PyTorch | Today | 20+ | 18,530 | High volume | Monthly |
+| vLLM | Today | 15+ | 4,279 | High volume | Bi-weekly |
+| HF Transformers | Today | 10+ | 2,349 | Well managed | Monthly |
+| Ollama | Today | 5+ | 2,943 | Active | Weekly |
+| LlamaIndex | Today | 5+ | 287 | Well managed | Bi-weekly |
+| Scikit-learn | Today | 3+ | 2,041 | Stable | Quarterly |
+| TensorFlow | Today | 5+ | 4,417 | Stable | Quarterly |
 
-### 📊 Data & RAG
-| | LlamaIndex | Scikit-learn |
-|---|------------|-------------|
-| **Position** | #1 RAG framework | #1 classical ML |
-| **Growth** | Strong growth | Stable/mature |
-| **TypeScript** | ✅ LlamaIndex.TS! | ❌ |
-| **Best For** | RAG, document AI, agents | Preprocessing, tabular ML |
-| **Recommendation** | ✅ High priority (TS version!) | 🟡 Know basics |
+## Use Case Mapping
 
-## Stack Recommendation for天子
+| Use Case | Best Choice | Alternative | Notes |
+|----------|------------|-------------|-------|
+| **Build RAG SaaS** | LlamaIndex.TS | LangChain.js | TypeScript native |
+| **Local LLM dev** | Ollama | llama.cpp | Docker-like UX |
+| **Fine-tune models** | HF Transformers | Axolotl | PEFT/LoRA support |
+| **Serve LLMs at scale** | vLLM | TGI (HF) | PagedAttention |
+| **Custom model training** | PyTorch | JAX | Research standard |
+| **Tabular ML** | Scikit-learn | XGBoost | Gold standard API |
+| **Browser ML** | TensorFlow.js | ONNX Runtime Web | Client-side inference |
 
-### Must-Have (directly usable)
-1. **Ollama** — Local LLM for development (88 TEMC)
-2. **HF Transformers** — Model access for any AI product (88 TEMC)
-3. **LlamaIndex** — RAG pipeline, TypeScript version available (84 TEMC)
+## 天子 Priority Stack
 
-### Should-Know (architecture understanding)
-4. **vLLM** — Production LLM serving patterns (87 TEMC)
-5. **PyTorch** — Foundation of all AI (82 TEMC)
-
-### Nice-to-Know (reference only)
-6. **TensorFlow** — Legacy reference, TF.js for browser ML (75 TEMC)
-7. **Scikit-learn** — API design gold standard (73 TEMC)
+```
+Layer 4 (Product):     LlamaIndex.TS + Next.js + Supabase pgvector
+Layer 3 (LLM Runtime): Ollama (dev) + OpenAI API (prod) + vLLM (self-host)
+Layer 2 (Models):      HuggingFace Transformers (fine-tuning + model hub)
+Layer 1 (Foundation):  PyTorch (understanding, not coding)
+Layer 0 (Classical):   Scikit-learn (reference only)
+```
 
 ## Key Insight
 
-> The real value for a one-person Micro SaaS operation is in the **application layer** (Ollama + HF + LlamaIndex), not the **framework layer** (PyTorch/TF). Master the tools that let you ship products, not the ones that let you train models from scratch.
+> **For a one-person AI SaaS company, the optimal strategy is to work at Layer 3-4 (LlamaIndex + Ollama + OpenAI) and only descend to Layer 1-2 (PyTorch + HF) when building custom models is required for differentiation.**

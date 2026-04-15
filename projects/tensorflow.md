@@ -1,68 +1,56 @@
 # TensorFlow
 
-> Google's open-source ML framework — production deployment, TPU optimization, and broad ecosystem.
+> An Open Source Machine Learning Framework for Everyone
 
 | Metric | Data |
-|--------|------|
+|------|------|
 | GitHub | https://github.com/tensorflow/tensorflow |
 | Stars | 194,732 |
-| Forks | 75,275 |
+| Forks | 75,274 |
 | License | Apache-2.0 |
 | Language | C++ / Python |
-| Last Commit | 2026-04-15 (today) |
-| Open Issues | 4,418 |
-| Contributors | 3,500+ |
+| Last Updated | 2026-04-15 |
+| Open Issues | 4,417 |
+| Contributors | 3,000+ |
+| Created | 2015-11-07 |
 
 ## TEMC Scoring
 
 | Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| T (Tech) | 88 | Production-grade, XLA compiler, TPU native, TFLite for mobile/edge, TF Serving for deployment. Massive codebase (C++ core). Well-engineered but complex. |
-| E (Ecosystem) | 90 | 194k stars (highest in ML), 75k forks. Google-backed. TF Hub, TF Lite, TF.js, TF Serving, Keras. But: mindshare declining in research (PyTorch dominates). |
-| M (Market) | 65 | Declining trend in research adoption. Still strong in production/enterprise (Google Cloud ML). Late-stage maturity. Not growing in developer mindshare. |
-| C (Combo) | 60 | C++ primary language, heavy framework. TF.js exists (TypeScript!) but limited. Not aligned with天子's stack. High learning cost for diminishing returns vs PyTorch. |
-| **Composite** | **75** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
+|------|------|------|
+| T (Tech) | 90 | Google-backed, production-grade. TF Serving, TF Lite, TF.js for multi-platform deployment. Keras integration excellent. XLA compiler for hardware optimization. |
+| E (Ecosystem) | 90 | 195k stars (highest in ML), massive existing deployments. But growth has stagnated vs PyTorch. Google Cloud TPU primary framework. |
+| M (Market) | 55 | Market share declining to PyTorch in research and new projects. Legacy deployments still significant. TF2 improved usability but ecosystem momentum shifted. |
+| C (Combo) | 55 | Python/C++. TF.js exists (TypeScript) but ecosystem fragmented. Less relevant for new LLM-era projects. TF Serving is notable for production deployment patterns. |
+| **Composite** | **71** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
 
-## Architecture Analysis
+## Core Value
+TensorFlow remains significant for production ML deployments, especially in Google Cloud ecosystem and mobile/edge (TF Lite). Its static graph optimization (XLA) provides excellent performance for serving. Historical importance as the framework that democratized deep learning.
 
-```
-tensorflow/
-├── tensorflow/
-│   ├── core/          # C++ runtime, ops, kernels
-│   ├── python/        # Python API
-│   ├── compiler/      # XLA compiler
-│   ├── lite/          # TFLite (mobile/edge)
-│   ├── js/            # TensorFlow.js
-│   └── tools/         # Build and deployment tools
-├── third_party/       # External dependencies
-└── ci/               # CI/CD infrastructure
-```
+## Architecture Highlights
+- **Keras API**: High-level API now fully integrated, excellent for rapid prototyping
+- **TF Serving**: Production model serving with gRPC/REST, auto-batching, model versioning
+- **TF Lite**: Mobile/embedded deployment with quantization support
+- **TF.js**: Browser and Node.js ML inference
+- **XLA Compiler**: Ahead-of-time compilation for TPU/GPU optimization
 
-**Architecture Pattern**: Monorepo, static computation graph (eager mode added later), XLA compilation.
+## Key Modules
+1. **tf.keras** — High-level model building API (large, independent)
+2. **tf.data** — Data pipeline construction (medium, low coupling)
+3. **TF Serving** — Production model serving (separate project, medium)
+4. **TF Lite** — Mobile/edge deployment (separate project, medium)
+5. **tf.distribute** — Distributed training strategies (medium, medium coupling)
 
-## Core Modules
+## Extractable Patterns
+- ⭐ **通用代码候选**: TF Serving model versioning pattern → code-base/ai-integration/model-serving/
+- tf.data pipeline patterns for efficient data loading
+- SavedModel format for model portability
 
-1. **XLA Compiler** — Optimizing compiler for linear algebra (large, high coupling)
-2. **TF Lite** — Mobile/edge deployment (medium, medium coupling)
-3. **TF Serving** — Production model serving (medium, low coupling)
-4. **Keras API** — High-level neural network API (medium, low coupling)
-5. **TF.js** — Browser/Node.js ML (medium, low coupling)
+## Why It Might NOT Be Worth It (反证)
+- Ecosystem momentum has decisively shifted to PyTorch
+- New LLM projects almost exclusively use PyTorch
+- TF's static graph paradigm is more complex and less Pythonic
+- For 天子's stack (OpenAI API + HuggingFace), TensorFlow adds no value
 
-## Extractable Components
-
-| Module | Difficulty | Est. Time | Target |
-|--------|-----------|-----------|--------|
-| TF.js patterns | Simple copy | 2-4h | code-base/ai-integration/ |
-| Model serving architecture | Documentation | 4h | best-practices/model-serving.md |
-| XLA optimization concepts | Documentation | 2h | best-practices/ |
-
-⭐ **Universal Code Candidate**: TF.js for browser-based ML inference (TypeScript!).
-
-## Why It Might NOT Be Worth Deep Investment
-
-- 🔴 Declining mindshare — PyTorch is the community default
-- 🔴 C++ heavy — not aligned with天子's stack
-- 🔴 Google's commitment unclear long-term (JAX competing internally)
-- 🟡 TF.js is the only TypeScript-relevant component
-- ✅ Still dominant in production/enterprise deployments
-- ✅ Highest star count in all of ML (historical momentum)
+## 天子 Verdict
+Historical importance acknowledged, but NOT recommended for 天子's current strategy. PyTorch ecosystem dominates for any new ML/LLM work. TF Serving patterns are the main extractable value.

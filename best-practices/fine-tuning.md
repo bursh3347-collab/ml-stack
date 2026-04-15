@@ -1,57 +1,33 @@
-# Fine-Tuning Best Practices
+# Best Practices: Fine-Tuning
 
-> Patterns for efficient model customization, extracted from HF Transformers and PyTorch ecosystem.
+> Extracted from HuggingFace Transformers, PyTorch, and production fine-tuning workflows
 
-*Sources: huggingface/transformers (159k⭐), pytorch/pytorch (99k⭐)*
+## Overview
 
-## When to Fine-Tune vs. RAG vs. Prompt Engineering
+Fine-tuning adapts pre-trained models to specific tasks or domains. With PEFT (Parameter-Efficient Fine-Tuning), it's now accessible to individual developers with limited GPU resources.
 
-| Approach | Best For | Cost | Time | Quality |
-|----------|---------|------|------|---------|
-| **Prompt Engineering** | Quick iteration, general tasks | Free | Minutes | Good |
-| **RAG** | Domain knowledge, up-to-date info | Low | Hours | Very Good |
-| **Fine-Tuning** | Specific behavior, style, format | Medium | Hours-Days | Excellent |
-| **Pre-Training** | New language, specialized domain | Very High | Weeks | — |
+## Pattern 1: LoRA Fine-Tuning (from HuggingFace PEFT)
 
-**Rule of thumb**: Start with prompt engineering → Add RAG → Fine-tune only if needed.
+**Source**: HuggingFace Transformers (159k⭐, Apache-2.0) + PEFT library
 
-## Fine-Tuning Methods
-
-### 1. LoRA (Low-Rank Adaptation)
-- Train only small adapter matrices (0.1-1% of parameters)
-- Original weights frozen → no catastrophic forgetting
-- Can swap adapters for different tasks
-- **Recommended for most use cases**
-
-### 2. QLoRA (Quantized LoRA)
-- Load base model in 4-bit, train LoRA adapters in FP16
-- Fits 70B model on single 48GB GPU
-- Slight quality trade-off vs full LoRA
-- **Best for resource-constrained setups**
-
-### 3. Full Fine-Tuning
-- Update all parameters
-- Requires large GPU memory (8× model size)
-- Risk of catastrophic forgetting
-- **Only for large companies with dedicated compute**
-
-## HF Transformers Fine-Tuning Recipe
+**Why LoRA**: Train only 0.1-1% of parameters. A 7B model fine-tune fits on a single consumer GPU (24GB VRAM).
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
 
-# 1. Load model + tokenizer
+# 1. Load base model
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3-8B")
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3-8B")
 
 # 2. Configure LoRA
 lora_config = LoraConfig(
-    r=16,              # Rank (8-64, higher = more params)
+    r=16,              # Rank — higher = more capacity, more VRAM
     lora_alpha=32,     # Scaling factor
     target_modules=["q_proj", "v_proj"],  # Which layers to adapt
     lora_dropout=0.05,
+    task_type="CAUSAL_LM"
 )
 model = get_peft_model(model, lora_config)
 
@@ -63,41 +39,91 @@ trainer = SFTTrainer(
         output_dir="./output",
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
-        num_train_epochs=3,
         learning_rate=2e-4,
+        num_train_epochs=3,
         fp16=True,
-    ),
+    )
 )
 trainer.train()
+
+# 4. Save adapter (tiny file, ~50MB vs 15GB full model)
+model.save_pretrained("./my-adapter")
 ```
 
-## Data Preparation Checklist
+## Pattern 2: QLoRA (4-bit Quantized LoRA)
 
-- [ ] Minimum 100 high-quality examples (ideally 1000+)
-- [ ] Consistent format (instruction-response pairs)
-- [ ] Deduplicated and cleaned
-- [ ] Train/validation split (90/10)
-- [ ] Balanced across categories
-- [ ] No PII or sensitive data
+**When to Use**: GPU VRAM < 24GB, or fine-tuning larger models (13B+)
 
-## Common Mistakes
+**Key Addition**: Load base model in 4-bit quantization, then apply LoRA on top.
 
-| Mistake | Impact | Solution |
-|---------|--------|----------|
-| Too little data | Overfitting | Get 1000+ examples |
-| No validation set | Can't detect overfitting | Always hold out 10% |
-| Too high learning rate | Catastrophic forgetting | Start with 2e-4 |
-| Wrong LoRA rank | Under/overfitting | Start with r=16 |
-| Training too long | Overfitting | Use early stopping |
-| No base model eval | Can't measure improvement | Benchmark before and after |
+```python
+from transformers import BitsAndBytesConfig
 
-## Cost Estimation
+quant_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+model = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B",
+    quantization_config=quant_config
+)
+```
 
-| Model Size | Method | GPU | Time | Cloud Cost |
-|-----------|--------|-----|------|------------|
-| 7B | LoRA | 1× A100 40GB | 2-4h | ~$8-16 |
-| 7B | QLoRA | 1× T4 16GB | 4-8h | ~$4-8 |
-| 70B | QLoRA | 1× A100 80GB | 8-24h | ~$32-96 |
-| 70B | Full FT | 8× A100 80GB | 24-72h | ~$800-2400 |
+**VRAM Requirements**:
+| Model Size | Full FT | LoRA | QLoRA |
+|-----------|---------|------|-------|
+| 7B | 60GB+ | 24GB | 12GB |
+| 13B | 120GB+ | 48GB | 24GB |
+| 70B | 600GB+ | 160GB | 48GB |
 
-**天子 Recommendation**: QLoRA on 7B models is the sweet spot for a one-person operation. Use Ollama for local testing, deploy fine-tuned model via vLLM.
+## Pattern 3: Dataset Preparation
+
+**Chat Format** (recommended for instruction-tuning):
+```json
+{
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "What is the return policy?"},
+    {"role": "assistant", "content": "Our return policy allows..."}
+  ]
+}
+```
+
+**Data Quality Rules**:
+1. **Quality > Quantity**: 1,000 high-quality examples > 100,000 noisy ones
+2. **Diverse examples**: Cover edge cases and different phrasings
+3. **Consistent format**: All examples should follow the same template
+4. **No data leakage**: Ensure test set has no overlap with training data
+
+## Pattern 4: Evaluation Pipeline
+
+```
+Base Model → Evaluate → Fine-Tune → Evaluate → Compare → Deploy
+                ↑                        ↑
+           Benchmark set            Same benchmark
+```
+
+**Key Metrics**:
+- Task-specific accuracy (domain questions)
+- Perplexity (language quality)
+- Human evaluation (for production readiness)
+- Regression testing (did fine-tuning break other capabilities?)
+
+## When NOT to Fine-Tune
+
+| Situation | Better Alternative |
+|-----------|-------------------|
+| Need current info | RAG (LlamaIndex) |
+| Simple formatting | Prompt engineering |
+| Few-shot learning works | In-context examples |
+| <100 training examples | Few-shot or RAG |
+| Budget < $50/month | Use larger API model |
+
+## Anti-Patterns
+
+1. **Fine-tuning for facts**: Use RAG instead — facts change, fine-tuning is expensive to update
+2. **Over-training**: Watch for catastrophic forgetting — the model loses general capabilities
+3. **No baseline**: Always measure the base model's performance first
+4. **Skipping eval**: Fine-tuning without evaluation is flying blind
+5. **Ignoring cost**: Cloud fine-tuning can cost $100+ per run — start with QLoRA locally

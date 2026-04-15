@@ -1,71 +1,62 @@
 # Ollama
 
-> Docker for LLMs — run any open-source model locally with one command.
+> Get up and running with LLMs locally — Docker for AI models
 
 | Metric | Data |
-|--------|------|
+|------|------|
 | GitHub | https://github.com/ollama/ollama |
-| Stars | 169,070 |
-| Forks | 15,596 |
+| Stars | 169,073 |
+| Forks | 15,597 |
 | License | MIT |
 | Language | Go |
-| Last Commit | 2026-04-15 (today) |
-| Open Issues | 2,944 |
+| Last Updated | 2026-04-15 |
+| Open Issues | 2,943 |
+| Created | 2023-06-26 |
 
 ## TEMC Scoring
 
 | Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| T (Tech) | 85 | Clean Go implementation, Docker-like UX (`ollama run llama3`), OpenAI-compatible API, quantization (GGUF), multi-model support. Supports Kimi-K2.5, GLM-5, MiniMax, DeepSeek, Qwen, Gemma. |
-| E (Ecosystem) | 92 | 169k stars (top 5 in all of GitHub), 15k forks. Explosive growth. Community: extensions, GUIs (Open WebUI 75k⭐), IDE integrations. |
-| M (Market) | 90 | Local LLM is the hottest trend — privacy, cost reduction, offline capability. Perfect timing with open-weight models (Llama, Qwen, DeepSeek). |
-| C (Combo) | 85 | MIT license. OpenAI-compatible API = drop-in replacement in天子's apps. Directly usable for local dev/testing. Ideal for Micro SaaS that needs local AI. |
-| **Composite** | **88** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
+|------|------|------|
+| T (Tech) | 88 | Excellent UX — `ollama run llama3` is Docker-level simplicity. Go-based for performance. GGUF format support, automatic GPU detection, model management. MLX backend for Apple Silicon. OpenAI-compatible API. |
+| E (Ecosystem) | 92 | 169k stars, explosive growth (from 0 to 169k in <3 years). Massive community. Integrations with LangChain, LlamaIndex, Open WebUI. Model library covers DeepSeek, Qwen, Gemma, LLaMA, Mistral. |
+| M (Market) | 90 | Local LLM running is THE hot trend — privacy-first, cost-effective, latency-free. Enterprise adoption accelerating. Every developer wants local LLM capability. |
+| C (Combo) | 85 | MIT license! REST API = language-agnostic. Perfect for local dev environment. Combines with LlamaIndex for local RAG. Can power offline-capable SaaS features. OpenAI-compatible API means drop-in replacement. |
+| **Composite** | **89** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
 
-## Architecture Analysis
+## Core Value
+Ollama democratizes local LLM inference. Its Docker-like CLI and OpenAI-compatible REST API make running any open-source LLM as simple as running a container. For developers building AI products, Ollama provides free, private, zero-latency inference during development and can power production features that require data privacy.
 
-```
-ollama/
-├── cmd/              # CLI entry points
-├── server/           # HTTP API server (OpenAI compatible)
-├── llm/              # LLM runtime (llama.cpp bindings)
-├── gpu/              # GPU detection and management
-├── format/           # Model format handling (GGUF)
-├── runners/          # Model execution runners
-└── api/              # Go client library
-```
+## Architecture Highlights
+- **CLI + REST API**: `ollama run model` CLI + `localhost:11434/api` REST endpoint
+- **GGUF/GGML**: Optimized quantized model format for CPU/GPU inference
+- **Multi-Backend**: llama.cpp (CPU/GPU), MLX (Apple Silicon), automatic hardware detection
+- **Model Management**: Pull/push models like Docker images, Modelfile for custom models
+- **OpenAI Compatibility**: `/v1/chat/completions` endpoint = drop-in OpenAI replacement
+- **Concurrent Requests**: Built-in request queuing and batching
 
-**Architecture Pattern**: Single binary, client-server, REST API, GGUF model format.
+## Key Modules
+1. **Model Runner** — GGUF loading, quantization, inference (large, core)
+2. **REST API Server** — OpenAI-compatible endpoints (medium, independent)
+3. **Model Registry** — Pull/push/list models (medium, independent)
+4. **MLX Backend** — Apple Silicon optimized inference (medium, separate)
+5. **GPU Manager** — Multi-GPU detection and memory management (small, core)
 
-## Core Modules
-
-1. **Server/API** — OpenAI-compatible HTTP server (medium, low coupling)
-2. **LLM Runtime** — llama.cpp-based inference (large, high coupling with GPU)
-3. **Model Management** — Pull/create/list/delete models (medium, low coupling)
-4. **GPU Detection** — Multi-GPU and VRAM management (small, medium coupling)
-5. **Format/GGUF** — Model format parsing and quantization (medium, medium coupling)
-
-## Extractable Components
-
-| Module | Difficulty | Est. Time | Target |
-|--------|-----------|-----------|--------|
-| OpenAI-compatible API pattern | Simple copy | 2h | code-base/ai-integration/ |
-| Model management CLI pattern | Need adaptation | 4h | code-base/ |
-| GPU detection logic | Documentation | 2h | best-practices/ |
-
-⭐ **Universal Code Candidate**: OpenAI-compatible API server pattern (reusable for any LLM wrapper).
+## Extractable Patterns
+- ⭐ **通用代码候选**: OpenAI-compatible API wrapper pattern → code-base/ai-integration/api-compatibility/
+- ⭐ **通用代码候选**: Model management (pull/cache/version) pattern → code-base/ai-integration/model-management/
+- Modelfile (Dockerfile for models) configuration pattern
 
 ## Business Value
+- **Pain Point**: Local LLM inference without cloud dependency (Important)
+- **Target Users**: Developers, privacy-conscious enterprises, air-gapped environments
+- **Monetization**: Ollama-powered features in SaaS (offline mode, private processing)
+- **差异化窗口**: Build SaaS that offers both cloud API + local Ollama option
 
-- **Pain Point**: Running LLMs locally without cloud costs (重要级)
-- **TAM**: Local AI market growing rapidly, tied to privacy regulations
-- **Monetization**: Ollama itself is free. For天子: use as local backend for SaaS products.
-- **Differentiation**: Build Micro SaaS tools that leverage Ollama as local inference engine.
+## Why It Might NOT Be Worth It (反证)
+- Go codebase — not in 天子's primary stack (TypeScript/Python)
+- Local inference quality still below cloud APIs (GPT-4, Claude) for complex tasks
+- Rapid model evolution means today's local models may be obsolete in months
+- Hardware requirements (good GPU) limit target audience
 
-## Why It Might NOT Be Worth Deep Investment
-
-- 🟡 Go language (not TypeScript), but API is language-agnostic
-- 🟡 Dependent on llama.cpp upstream (single point of failure)
-- 🟡 Enterprise features limited (no auth, no rate limiting built-in)
-- ✅ MIT license = maximum commercial flexibility
-- ✅ OpenAI-compatible API = zero migration cost
+## 天子 Verdict
+🔴 **HIGH PRIORITY** — Ollama is essential for 天子's development workflow and product strategy. Use for: (1) free development/testing without API costs, (2) local RAG pipeline testing with LlamaIndex, (3) product feature: "run privately on your own hardware" as premium SaaS differentiator.
