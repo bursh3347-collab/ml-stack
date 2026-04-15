@@ -1,59 +1,66 @@
-# Machine Learning & Deep Learning — Comparison
+# ML/DL Stack — Project Comparison
 
-> Last updated: 2026-04-15
+> Horizontal comparison of 7 high-star ML/DL projects analyzed in this repository.
 
-## Overview Matrix
+*Last updated: 2026-04-15*
 
-| Project | Stars | Language | License | Type | TEMC | Best For |
-|---------|-------|----------|---------|------|------|----------|
-| **TensorFlow** | ~190k | Python/C++ | Apache-2.0 | DL Framework | 75 | Production ML, mobile/edge |
-| **HuggingFace** | ~145k | Python | Apache-2.0 | Model Hub | **88** | Pretrained models, NLP/LLM |
-| **Ollama** | ~120k | Go | MIT | Local LLM | **90** | Running LLMs locally |
-| **Puppeteer** | ~94k | TypeScript | Apache-2.0 | Browser Auto | — | (see automation-stack) |
-| **PyTorch** | ~90k | Python/C++ | BSD-3 | DL Framework | **86** | Deep learning research + prod |
-| **Scikit-learn** | ~62k | Python | BSD-3 | Classical ML | 73 | Tabular data, preprocessing |
-| **vLLM** | ~50k | Python/CUDA | Apache-2.0 | LLM Inference | **84** | Production LLM serving |
-| **LlamaIndex** | ~40k | Python/TS | MIT | RAG Framework | **85** | RAG applications |
-| **W&B** | ~10k | Python | MIT | MLOps | 77 | Experiment tracking |
+## Overview Table
+
+| Project | Stars | License | Language | Latest | T | E | M | C | **TEMC** |
+|---------|-------|---------|----------|--------|---|---|---|---|----------|
+| **HF Transformers** | 159k | Apache-2.0 | Python | v5.5.4 (Apr 13) | 90 | 95 | 85 | 82 | **88** |
+| **Ollama** | 169k | MIT | Go | — | 85 | 92 | 90 | 85 | **88** |
+| **vLLM** | 77k | Apache-2.0 | Python/C++ | v0.19.0 (Apr 3) | 90 | 88 | 92 | 78 | **87** |
+| **LlamaIndex** | 49k | MIT | Python/TS | — | 82 | 80 | 88 | 85 | **84** |
+| **PyTorch** | 99k | BSD-3 | Python/C++ | v2.11.0 (Mar 23) | 92 | 95 | 75 | 70 | **82** |
+| **TensorFlow** | 195k | Apache-2.0 | C++/Python | — | 88 | 90 | 65 | 60 | **75** |
+| **Scikit-learn** | 66k | BSD-3 | Python | — | 88 | 85 | 60 | 65 | **73** |
 
 ## Category Breakdown
 
-### 🧠 Deep Learning Frameworks
+### 🏗️ Frameworks (Foundation Layer)
 | | PyTorch | TensorFlow |
 |---|---------|------------|
-| Research Adoption | ★★★★★ | ★★★ |
-| Production | ★★★★ | ★★★★★ |
-| Dynamic Graph | ✅ | ✅ (TF 2.x) |
-| Mobile/Edge | ✅ ExecuTorch | ✅ TFLite (stronger) |
-| Community | Growing | Declining |
-| **Verdict** | 🏆 **Default choice** | Production legacy |
+| **Position** | #1 in research + gaining production | #1 in legacy production |
+| **Growth** | Accelerating | Decelerating |
+| **TypeScript** | ❌ | TF.js (limited) |
+| **Best For** | Training, research, new projects | Enterprise legacy, TPU, mobile (TFLite) |
+| **Recommendation** | ✅ Learn this | 🟡 Know architecture, don't invest deeply |
 
-### 🤖 LLM Infrastructure
-| | Ollama | vLLM | HuggingFace TGI |
-|---|--------|------|------------------|
-| Use Case | Local dev | Production serving | Production serving |
-| Ease of Use | ★★★★★ | ★★★ | ★★★ |
-| Performance | Good | ★★★★★ (PagedAttention) | ★★★★ |
-| API | OpenAI-compatible | OpenAI-compatible | Custom |
-| Multi-GPU | Limited | ✅ Tensor parallel | ✅ |
-| **Verdict** | 🏆 **Local dev** | 🏆 **Production** | Alternative |
+### 🧠 Model Hub & Inference
+| | HF Transformers | Ollama | vLLM |
+|---|-----------------|--------|------|
+| **Position** | Universal model hub | Local LLM runner | Production serving |
+| **Use Case** | Model access & fine-tuning | Development & privacy | High-throughput serving |
+| **API** | Python library | OpenAI-compatible REST | OpenAI-compatible REST |
+| **TypeScript** | transformers.js | API (language-agnostic) | API (language-agnostic) |
+| **Best For** | Any LLM application | Local dev, privacy-first apps | Production deployment |
+| **Recommendation** | ✅ Essential | ✅ Essential for local dev | ✅ Essential for deployment |
 
-### 📚 RAG & LLM Applications
-| | LlamaIndex | LangChain |
-|---|-----------|----------|
-| Focus | Data framework | Agent framework |
-| TypeScript | ✅ LlamaIndex.TS | ✅ LangChain.js |
-| Data Connectors | 160+ | 80+ |
-| RAG Quality | ★★★★★ | ★★★★ |
-| Agent Support | Good | ★★★★★ |
-| **Verdict** | 🏆 **For RAG** | Better for agents |
+### 📊 Data & RAG
+| | LlamaIndex | Scikit-learn |
+|---|------------|-------------|
+| **Position** | #1 RAG framework | #1 classical ML |
+| **Growth** | Strong growth | Stable/mature |
+| **TypeScript** | ✅ LlamaIndex.TS! | ❌ |
+| **Best For** | RAG, document AI, agents | Preprocessing, tabular ML |
+| **Recommendation** | ✅ High priority (TS version!) | 🟡 Know basics |
 
-## Recommendation for Tianzi (TypeScript + Next.js + AI)
+## Stack Recommendation for天子
 
-1. **Ollama** (TEMC 90) — #1 pick. Local LLM for development. OpenAI-compatible API. MIT.
-2. **HuggingFace** (TEMC 88) — #2. Gateway to all models. Essential knowledge.
-3. **PyTorch** (TEMC 86) — #3. Understand model training. Essential ML foundation.
-4. **LlamaIndex** (TEMC 85) — #4. RAG framework with TypeScript version. Direct use.
-5. **vLLM** (TEMC 84) — Production LLM serving when you need scale.
-6. **W&B** (TEMC 77) — Experiment tracking, eval concepts.
-7. **TensorFlow** (TEMC 75) / **Scikit-learn** (TEMC 73) — Reference, lower priority.
+### Must-Have (directly usable)
+1. **Ollama** — Local LLM for development (88 TEMC)
+2. **HF Transformers** — Model access for any AI product (88 TEMC)
+3. **LlamaIndex** — RAG pipeline, TypeScript version available (84 TEMC)
+
+### Should-Know (architecture understanding)
+4. **vLLM** — Production LLM serving patterns (87 TEMC)
+5. **PyTorch** — Foundation of all AI (82 TEMC)
+
+### Nice-to-Know (reference only)
+6. **TensorFlow** — Legacy reference, TF.js for browser ML (75 TEMC)
+7. **Scikit-learn** — API design gold standard (73 TEMC)
+
+## Key Insight
+
+> The real value for a one-person Micro SaaS operation is in the **application layer** (Ollama + HF + LlamaIndex), not the **framework layer** (PyTorch/TF). Master the tools that let you ship products, not the ones that let you train models from scratch.

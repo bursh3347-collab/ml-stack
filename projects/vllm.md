@@ -1,40 +1,80 @@
 # vLLM
 
-> Easy, fast, and cheap LLM serving for everyone.
+> High-throughput, memory-efficient LLM inference and serving engine.
 
 | Metric | Data |
 |--------|------|
-| GitHub | [vllm-project/vllm](https://github.com/vllm-project/vllm) |
-| Stars | ~50,000 |
-| Forks | ~8,000 |
+| GitHub | https://github.com/vllm-project/vllm |
+| Stars | 76,687 |
+| Forks | 15,620 |
 | License | Apache-2.0 |
-| Language | Python + C++/CUDA |
-| Last Update | 2026-04 (very active) |
-| Contributors | 700+ |
+| Language | Python / C++ / CUDA |
+| Latest Release | v0.19.0 (2026-04-03, 12 days ago) |
+| Open Issues | 4,277 |
+| Last Commit | 2026-04-15 (today) |
 
-## TEMC Score
+## TEMC Scoring
 
 | Dimension | Score | Rationale |
 |-----------|-------|-----------|
-| T Tech | 92 | PagedAttention (24x throughput). Continuous batching. Speculative decoding. Tensor parallelism. SOTA inference. |
-| E Ecosystem | 85 | 50k stars, UC Berkeley origin. Adopted by major AI companies. Active development pace. |
-| M Market | 88 | LLM serving is critical infrastructure. Every company deploying LLMs needs efficient inference. Cost reduction is key. |
-| C Combo | 68 | Python/CUDA (not TypeScript). But provides OpenAI-compatible API = consume from any language. Infrastructure knowledge essential. |
-| **Overall** | **84** | T×0.25 + E×0.20 + M×0.30 + C×0.25 = 83.8 |
+| T (Tech) | 90 | PagedAttention (2-4x throughput), continuous batching, speculative decoding, FP8/NVFP4 quantization, FlashInfer MLA, OpenAI-compatible API. Blackwell B300 support. 448 commits in v0.19.0 alone. |
+| E (Ecosystem) | 88 | 76k stars, 15k forks, 197 contributors per release. UC Berkeley origin → Linux Foundation. Used by: Anyscale, AWS, Azure, etc. Rapid growth (+26k stars in months). |
+| M (Market) | 92 | LLM serving is THE infrastructure bottleneck. Every company deploying LLMs needs efficient inference. vLLM is becoming the default. Perfect timing. |
+| C (Combo) | 78 | Python/C++/CUDA (not TypeScript). Server-side only. But critical for any LLM product deployment. OpenAI-compatible API = integrate from天子's TypeScript apps. Learning cost: medium. |
+| **Composite** | **87** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
 
-## Core Value
-The fastest open-source LLM inference engine. PagedAttention manages GPU memory like OS virtual memory, achieving 24x higher throughput than naive serving. Critical infrastructure for production LLM deployment.
+## Architecture Analysis
 
-## Architecture Highlights
-- **PagedAttention**: KV cache managed in non-contiguous blocks (like OS virtual memory)
-- **Continuous Batching**: Dynamic batch formation for maximum GPU utilization
-- **Speculative Decoding**: Small model drafts, large model verifies for faster generation
-- **Tensor Parallelism**: Split model across multiple GPUs
-- **OpenAI-Compatible API**: Drop-in replacement for OpenAI API
-- **Quantization**: AWQ, GPTQ, FP8 support for model compression
+```
+vllm/
+├── vllm/
+│   ├── engine/           # Core engine (V1 + V2 runner)
+│   ├── model_executor/   # Model execution layer
+│   ├── worker/           # Distributed worker
+│   ├── attention/        # Attention backends (FlashAttention, FlashInfer)
+│   ├── spec_decode/      # Speculative decoding
+│   ├── quantization/     # Quantization (FP8, GPTQ, AWQ, NVFP4)
+│   ├── entrypoints/      # API servers (OpenAI, embeddings)
+│   └── distributed/      # TP/PP/EP support
+├── csrc/                 # C++/CUDA kernels
+├── benchmarks/           # Performance benchmarks
+└── tests/               # Test suite
+```
 
-## Extractable Patterns
-- PagedAttention memory management concept
-- Continuous batching for throughput optimization
-- OpenAI-compatible serving API
-- Model parallelism strategies
+**Architecture Pattern**: Engine-Worker pattern, PagedAttention memory management, plugin-based attention backends.
+
+**Key Innovation**: PagedAttention — manages KV cache like OS virtual memory pages, enabling 2-4x higher throughput.
+
+## Core Modules
+
+1. **PagedAttention Engine** — KV cache paging system (large, high coupling)
+2. **Model Executor** — Model loading and execution (large, medium coupling)
+3. **OpenAI-Compatible Server** — REST API endpoint (medium, low coupling)
+4. **Quantization** — FP8/NVFP4/GPTQ/AWQ support (medium, low coupling)
+5. **Speculative Decoding** — Draft-verify acceleration (medium, medium coupling)
+
+## Extractable Components
+
+| Module | Difficulty | Est. Time | Target |
+|--------|-----------|-----------|--------|
+| OpenAI server pattern | Simple copy | 2h | code-base/ai-integration/ |
+| Model serving architecture | Documentation | 4h | best-practices/model-serving.md |
+| Quantization recipes | Documentation | 2h | best-practices/ |
+| Benchmarking framework | Need adaptation | 4h | code-base/ |
+
+⭐ **Universal Code Candidate**: OpenAI-compatible API server, model serving deployment patterns.
+
+## Business Value
+
+- **Pain Point**: LLM inference cost and latency (致命级)
+- **TAM**: LLM inference market $50B+ by 2028
+- **Monetization**: vLLM is free. Value for天子: reduce inference costs for AI SaaS products.
+- **Differentiation**: Optimize serving costs = competitive advantage in Micro SaaS.
+
+## Why It Might NOT Be Worth Deep Investment
+
+- 🔴 Heavy CUDA dependency — requires GPU infrastructure
+- 🔴 Complex codebase — C++/CUDA kernels not accessible to most
+- 🟡 Rapidly evolving API — frequent breaking changes
+- ✅ But THE standard for LLM serving — must know architecture
+- ✅ OpenAI-compatible = easy integration

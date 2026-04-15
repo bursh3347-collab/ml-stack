@@ -1,47 +1,77 @@
 # Hugging Face Transformers
 
-> State-of-the-art ML for PyTorch, TensorFlow, and JAX. The model hub.
+> The universal model hub and inference framework — 500k+ models, state-of-the-art NLP/Vision/Audio/Multimodal.
 
 | Metric | Data |
 |--------|------|
-| GitHub | [huggingface/transformers](https://github.com/huggingface/transformers) |
-| Stars | ~145,000 |
-| Forks | ~29,000 |
+| GitHub | https://github.com/huggingface/transformers |
+| Stars | 159,412 |
+| Forks | 32,876 |
 | License | Apache-2.0 |
 | Language | Python |
-| Last Update | 2026-04 (very active) |
-| Contributors | 2,800+ |
+| Latest Release | v5.5.4 (2026-04-13, 2 days ago!) |
+| Open Issues | 2,348 |
+| Last Commit | 2026-04-15 (today) |
 
-## TEMC Score
+## TEMC Scoring
 
 | Dimension | Score | Rationale |
 |-----------|-------|-----------|
-| T Tech | 92 | Unified API for 200k+ models. Auto classes, pipelines, PEFT, quantization, Flash Attention. Research + production. |
-| E Ecosystem | 98 | 145k stars, 200k+ models on Hub. $4.5B valuation. De facto standard for accessing pretrained models. |
-| M Market | 90 | The gateway to LLMs. Every company uses HF models. Hub is the npm of ML. |
-| C Combo | 72 | Python-only, but models accessed via APIs. GGUF/ONNX formats for cross-platform. Essential for any AI app. |
-| **Overall** | **88** | T×0.25 + E×0.20 + M×0.30 + C×0.25 = 87.6 |
+| T (Tech) | 90 | Excellent API design (pipeline, AutoModel, Trainer). Supports all major architectures (Gemma 4, DeepSeek, Qwen3, etc.). Multi-modal (text+vision+audio). Quantization support (FP8, INT4). |
+| E (Ecosystem) | 95 | 159k stars, 32k forks, 500k+ models on HF Hub. De facto standard for model distribution. Integrates with PyTorch, TF, JAX. Active: v5.5.4 released 2 days ago. |
+| M (Market) | 85 | Critical infrastructure for any LLM application. HF raised $235M at $4.5B valuation. Market timing: LLM adoption accelerating. Every AI startup uses HF. |
+| C (Combo) | 82 | Python (not TypeScript), but directly usable for model inference in天子's AI products. `transformers.js` exists for browser. Essential for RAG, Agent, and LLM app development. |
+| **Composite** | **88** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
 
-## Core Value
-The npm/GitHub of ML models. Unified API to load and use 200k+ pretrained models. From BERT to Llama 3 to Stable Diffusion — one `from_pretrained()` call. The essential gateway to modern AI.
+## Architecture Analysis
 
-## Architecture Highlights
-- **Auto Classes**: Automatic model/tokenizer selection based on model name
-- **Pipeline API**: One-line inference for common tasks (text, vision, audio)
-- **Model Hub**: 200k+ models, datasets, spaces. Git-based version control for models
-- **PEFT**: Parameter-efficient fine-tuning (LoRA, QLoRA, adapters)
-- **Quantization**: BitsAndBytes, GPTQ, AWQ for model compression
-- **Trainer**: Unified training API with distributed support
+```
+transformers/
+├── src/transformers/
+│   ├── models/           # 300+ model implementations
+│   ├── pipelines/        # High-level inference pipelines
+│   ├── trainer*.py       # Training utilities
+│   ├── generation/       # Text generation (beam search, sampling)
+│   ├── quantizers/       # Quantization (GPTQ, AWQ, BNB)
+│   ├── integrations/     # External tool integrations
+│   └── tokenization_*    # Tokenizer implementations
+├── docs/                 # Comprehensive documentation
+├── examples/             # Training/inference examples
+└── tests/               # Extensive test suite
+```
 
-## Key Modules
-1. **Model Zoo** (Core) — 200+ model architectures, Auto classes
-2. **Pipeline API** (Core) — Zero-code inference for 30+ tasks
-3. **Tokenizers** (Core) — Fast tokenization (Rust-based)
-4. **Hub Client** (Medium) — Model upload/download, versioning, auth
-5. **PEFT/Quantization** (Medium) — Fine-tuning and compression tools
+**Architecture Pattern**: Plugin-based model registry, auto-class discovery, pipeline abstraction.
 
-## Extractable Patterns
-- **⭐ Universal Code Candidate: Model Loading Pattern** → code-base/ai-integration/model-loading/
-- Pipeline abstraction for ML inference
-- Hub API integration pattern (model registry)
-- LoRA fine-tuning configuration
+## Core Modules
+
+1. **AutoModel / AutoTokenizer** — Automatic model/tokenizer loading (medium, low coupling)
+2. **Pipeline API** — Zero-code inference for 20+ tasks (medium, low coupling)
+3. **Trainer** — Training loop with distributed support (large, medium coupling)
+4. **Generation** — Text generation strategies (medium, medium coupling)
+5. **Quantization** — Model compression (FP8, INT4, GPTQ, AWQ) (medium, low coupling)
+
+## Extractable Components
+
+| Module | Difficulty | Est. Time | Target |
+|--------|-----------|-----------|--------|
+| Pipeline patterns | Simple copy | 2h | code-base/ai-integration/ |
+| Model loading patterns | Need adaptation | 4h | code-base/ai-integration/ |
+| Quantization recipes | Documentation | 2h | best-practices/fine-tuning.md |
+| Generation strategies | Documentation | 3h | best-practices/ |
+
+⭐ **Universal Code Candidate**: Pipeline API design pattern, AutoModel registry pattern.
+
+## Business Value
+
+- **Pain Point**: Model access and inference (致命级 for any AI app)
+- **TAM**: Embedded in $47B+ AI market
+- **Monetization**: HF Hub (Pro $9/mo, Enterprise custom). For天子: essential dependency.
+- **Differentiation**: Build specialized pipelines on top of HF for niche verticals.
+
+## Why It Might NOT Be Worth Deep Investment
+
+- 🟡 Python-only core (transformers.js is limited)
+- 🟡 HF Hub lock-in risk (model hosting dependency)
+- 🟡 Too many models = decision paralysis for newcomers
+- ✅ But absolutely essential — no AI product without model access
+- ✅ Community and docs are world-class

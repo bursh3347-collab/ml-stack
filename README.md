@@ -1,59 +1,84 @@
-# 🧠 ml-stack
+# 🧠 ML/DL Stack
 
-> ⭐ Maturity: **L1 Growing** — 8 projects analyzed, comparison and best practices available.
+> ⭐ Maturity: **L1 Growing** — 7 projects analyzed, comparison and best practices available.
 
-Extracted best practices and deep analyses from the world's top machine learning & deep learning open-source projects.
+Extracted best practices and analysis from the world's top machine learning and deep learning open-source projects.
 
-## 📊 Leaderboard (by TEMC Score)
+[![Stars](https://img.shields.io/github/stars/bursh3347-collab/ml-stack?style=social)](https://github.com/bursh3347-collab/ml-stack)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-| Rank | Project | Stars | TEMC | Trend |
-|------|---------|-------|------|-------|
-| 1 | [Ollama](projects/ollama.md) | ~120k | **90** | 🚀 |
-| 2 | [HuggingFace Transformers](projects/huggingface-transformers.md) | ~145k | **88** | 🚀 |
-| 3 | [PyTorch](projects/pytorch.md) | ~90k | **86** | ↑ |
-| 4 | [LlamaIndex](projects/llamaindex.md) | ~40k | **85** | 🚀 |
-| 5 | [vLLM](projects/vllm.md) | ~50k | **84** | 🚀 |
-| 6 | [W&B](projects/wandb.md) | ~10k | **77** | ↑ |
-| 7 | [TensorFlow](projects/tensorflow.md) | ~190k | **75** | → |
-| 8 | [Scikit-learn](projects/scikit-learn.md) | ~62k | **73** | → |
+## 📊 Projects Analyzed (7)
 
-## 📂 Repository Structure
+| Project | Stars | TEMC | Category |
+|---------|-------|------|----------|
+| [HF Transformers](projects/huggingface-transformers.md) | 159k | **88** | Model Hub & Inference |
+| [Ollama](projects/ollama.md) | 169k | **88** | Local LLM Runner |
+| [vLLM](projects/vllm.md) | 77k | **87** | LLM Serving Engine |
+| [LlamaIndex](projects/llamaindex.md) | 49k | **84** | RAG & Document AI |
+| [PyTorch](projects/pytorch.md) | 99k | **82** | Deep Learning Framework |
+| [TensorFlow](projects/tensorflow.md) | 195k | **75** | ML Framework |
+| [Scikit-learn](projects/scikit-learn.md) | 66k | **73** | Classical ML |
+
+## 📈 Trending (Week of 2026-04-15)
+
+| Rank | Project | Total Stars | Trend |
+|------|---------|------------|-------|
+| 1 | Ollama | 169k | 🚀 |
+| 2 | HF Transformers | 159k | 🚀 |
+| 3 | vLLM | 77k | 🚀 |
+| 4 | LlamaIndex | 49k | ↑ |
+
+## 🏗️ Repository Structure
 
 ```
 ml-stack/
 ├── README.md              ← You are here
-├── projects/              ← Individual project analyses (TEMC-scored)
+├── projects/              ← Detailed analysis per project
 │   ├── pytorch.md
 │   ├── tensorflow.md
 │   ├── huggingface-transformers.md
 │   ├── ollama.md
 │   ├── llamaindex.md
 │   ├── vllm.md
-│   ├── wandb.md
 │   └── scikit-learn.md
 ├── best-practices/        ← Extracted patterns
 │   ├── model-serving.md
 │   ├── rag-patterns.md
 │   └── fine-tuning.md
-├── code/                  ← Extracted code (coming in L2)
-├── comparison.md          ← Side-by-side comparison table
-└── SOURCES.md             ← All source projects with links
+├── comparison.md          ← Horizontal comparison table
+├── code/                  ← Code extractions (coming)
+└── SOURCES.md             ← All source projects
 ```
 
-## 🔥 Quick Picks
+## 🎯 How to Use This Repo
 
-- **Running LLMs locally?** → [Ollama](projects/ollama.md) — Docker for LLMs, OpenAI-compatible API
-- **Need pretrained models?** → [HuggingFace](projects/huggingface-transformers.md) — The npm of ML
-- **Building RAG apps?** → [LlamaIndex](projects/llamaindex.md) — TypeScript version available!
-- **Production LLM serving?** → [vLLM](projects/vllm.md) — PagedAttention for 24x throughput
-- **Learning deep learning?** → [PyTorch](projects/pytorch.md) — The framework standard
+1. **Quick Overview**: Read `comparison.md` for a side-by-side view
+2. **Deep Dive**: Open any `projects/*.md` for TEMC scoring + architecture analysis
+3. **Best Practices**: Check `best-practices/` for extracted patterns
+4. **Decision**: Use the recommendation matrix in `comparison.md`
 
-## 📖 Best Practices
+## 🔬 TEMC Scoring System
 
-- [Model Serving](best-practices/model-serving.md) — Deployment patterns from vLLM, Ollama, TF Serving
-- [RAG Patterns](best-practices/rag-patterns.md) — Retrieval-Augmented Generation architecture
-- [Fine-Tuning](best-practices/fine-tuning.md) — LoRA, data preparation, evaluation
+Every project is evaluated on 4 dimensions (0-100):
+
+- **T (Technology)**: Code quality, architecture, documentation
+- **E (Ecosystem)**: Community activity, integrations, maintenance
+- **M (Market)**: Timing, competition, monetization potential
+- **C (Combination)**: Stack compatibility, extractability, learning cost
+
+**Composite** = T×0.25 + E×0.20 + M×0.30 + C×0.25
+
+## 📅 Update Schedule
+
+- **Weekly**: Trending data updated
+- **Monthly**: New projects added, existing scores refreshed
+- **Quarterly**: Full re-scan of all projects
+
+## 🔗 Related Repositories
+
+- [ai-agent-stack](https://github.com/bursh3347-collab/ai-agent-stack) — AI Agent frameworks analysis
+- [code-base](https://github.com/bursh3347-collab/code-base) — Universal code patterns
 
 ---
 
-*Part of the [GitHub Open Source Knowledge Restructuring Project](https://github.com/bursh3347-collab). Powered by TEMC scoring methodology.*
+*Generated by [天工系统](https://github.com/bursh3347-collab) GitHub代码猎手 — automated open source intelligence.*

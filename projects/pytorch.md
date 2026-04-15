@@ -1,47 +1,77 @@
 # PyTorch
 
-> The most popular deep learning framework — from research to production.
+> The dominant deep learning framework — dynamic computation graphs, GPU acceleration, and production-grade tooling.
 
 | Metric | Data |
 |--------|------|
-| GitHub | [pytorch/pytorch](https://github.com/pytorch/pytorch) |
-| Stars | ~90,000 |
-| Forks | ~24,000 |
+| GitHub | https://github.com/pytorch/pytorch |
+| Stars | 99,144 |
+| Forks | 27,495 |
 | License | BSD-3-Clause |
-| Language | Python + C++ |
-| Last Update | 2026-04 (very active) |
-| Contributors | 4,000+ |
+| Language | Python / C++ |
+| Latest Release | v2.11.0 (2026-03-23) |
+| Open Issues | 18,534 |
+| Last Commit | 2026-04-15 (today) |
 
-## TEMC Score
+## TEMC Scoring
 
 | Dimension | Score | Rationale |
 |-----------|-------|-----------|
-| T Tech | 95 | Dynamic computation graph, CUDA, MPS, distributed training, TorchScript, torch.compile. Research + production grade. |
-| E Ecosystem | 95 | 90k stars, Meta-backed, 4000+ contributors. HuggingFace default. Dominant in research and increasingly in production. |
-| M Market | 88 | Won the framework war. Default for LLM training/fine-tuning. Growing production adoption with TorchServe. |
-| C Combo | 65 | Python-only. But LLM models trained in PyTorch → served via APIs (vLLM, Ollama) → consumed from TypeScript. Essential knowledge. |
-| **Overall** | **86** | T×0.25 + E×0.20 + M×0.30 + C×0.25 = 85.8 |
+| T (Tech) | 92 | Production-grade code, FlexAttention w/ FlashAttention-4 on Blackwell, CUDA 13.0 default, torch.compile matured, XPU Graph support, MPS Apple Silicon expansion. Architecture: dynamic graph + eager mode + compiler optimization. Doc quality: excellent (pytorch.org). |
+| E (Ecosystem) | 95 | 99k stars, 27k forks, 3000+ contributors, Meta-backed. PyTorch Foundation under Linux Foundation. Dominant in research (>80% papers). Ecosystem: torchvision, torchaudio, torchtext, lightning, HuggingFace all built on it. |
+| M (Market) | 75 | Framework itself not monetizable, but foundational infrastructure. Market position: #1 in research, gaining in production (overtook TF). Late-stage maturity — value is as dependency, not standalone product. |
+| C (Combo) | 70 | Python (not TypeScript), but foundation for all AI work. vLLM, HF Transformers, LlamaIndex all depend on it. Heavy (can't embed in Micro SaaS directly), but essential for model training/fine-tuning. Learning cost: medium-high. |
+| **Composite** | **82** | T×0.25 + E×0.20 + M×0.30 + C×0.25 |
 
-## Core Value
-The dominant deep learning framework. Dynamic computation graphs for intuitive debugging. From research prototyping to production deployment. Every major LLM is trained on PyTorch.
+## Architecture Analysis
 
-## Architecture Highlights
-- **Dynamic Computation Graph (Eager Mode)**: Build graph on-the-fly during forward pass
-- **torch.compile**: JIT compilation for 2-3x speedup without code changes
-- **Distributed Training**: DDP, FSDP for multi-GPU/multi-node training
-- **CUDA + MPS**: GPU acceleration for NVIDIA and Apple Silicon
-- **TorchScript**: Export models for production (C++ runtime)
-- **Ecosystem**: TorchVision, TorchAudio, TorchText, TorchRec
+```
+pytorch/
+├── torch/           # Python frontend (nn, autograd, optim, compile)
+├── aten/            # C++ tensor library (ATen)
+├── c10/             # Core library (allocators, dispatch, streams)
+├── caffe2/          # Legacy (being phased out)
+├── torchgen/        # Code generation for ops
+├── functorch/       # Function transforms (vmap, grad)
+└── test/            # Comprehensive test suite
+```
 
-## Key Modules
-1. **Autograd Engine** (Core) — Automatic differentiation for all tensor operations
-2. **nn Module System** (Core) — Layer definitions, model composition, parameter management
-3. **Distributed** (Large) — DDP, FSDP, RPC for multi-GPU/multi-node
-4. **torch.compile** (Medium) — Graph capture and optimization
-5. **Data Loading** (Medium) — DataLoader, Dataset, DistributedSampler
+**Architecture Pattern**: Monorepo, multi-language (Python/C++/CUDA), dispatcher-based op resolution.
 
-## Extractable Patterns
-- Module composition pattern (nn.Module inheritance)
-- Training loop best practices
-- Mixed precision training pattern
-- Distributed training architecture
+**Key Dependencies**: CUDA, cuDNN 9.19, NCCL, MKL/oneDNN, Triton.
+
+**Baseline Stack Match**: 6/10 — Python (not TypeScript), but universal AI foundation.
+
+## Core Modules
+
+1. **torch.nn** — Neural network layers and loss functions (large, low coupling)
+2. **torch.compile / Dynamo / Inductor** — Compiler stack for optimization (large, medium coupling)
+3. **torch.distributed** — Distributed training (FSDP, DTensor, TP/PP) (large, medium coupling)
+4. **torch.autograd** — Automatic differentiation engine (medium, high coupling with aten)
+5. **FlexAttention** — Flexible attention with Flash backend (medium, low coupling)
+
+## Extractable Components
+
+| Module | Difficulty | Est. Time | Target |
+|--------|-----------|-----------|--------|
+| FlexAttention patterns | Need adaptation | 4-8h | code-base/ai-integration/ |
+| torch.compile best practices | Documentation | 2-4h | best-practices/ |
+| Distributed training patterns | Documentation | 4-8h | best-practices/ |
+| Model serving pipeline | Need adaptation | 8-16h | code-base/deploy/ |
+
+⭐ **Universal Code Candidate**: torch.compile optimization patterns, distributed training recipes.
+
+## Business Value
+
+- **Pain Point**: Model training/inference infrastructure (致命级)
+- **TAM**: $47B+ AI/ML market
+- **Monetization**: Not directly — it's infrastructure. Value is as enabler for天子's AI products.
+- **Differentiation Window**: None (mature). Value is in mastery, not modification.
+
+## Why It Might NOT Be Worth Deep Investment
+
+- 🔴 Too large and complex for one-person operation to contribute meaningfully
+- 🔴 Python-only, doesn't match TypeScript baseline stack
+- 🔴 Mature framework — no differentiation opportunity
+- 🟡 Learning curve is steep for advanced features (compile, distributed)
+- ✅ But essential knowledge for any AI product builder
